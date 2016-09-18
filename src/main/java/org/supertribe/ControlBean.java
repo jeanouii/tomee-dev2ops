@@ -8,6 +8,7 @@ import javax.ejb.MessageDriven;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Map;
 
 @MessageDriven
@@ -31,13 +32,11 @@ public class ControlBean implements CrestListener {
 
     @Command
     public StreamingOutput list() {
-        return new StreamingOutput() {
-            @Override
-            public void write(OutputStream outputStream) throws IOException {
-                final Map<String, Integer> users = control.getUsers();
-                for (final Map.Entry<String, Integer> entry : users.entrySet()) {
-                    System.out.printf(" - %s = %s%n", entry.getKey(), entry.getValue());
-                }
+        return outputStream -> {
+            final PrintStream out = new PrintStream(outputStream);
+            final Map<String, Integer> users = control.getUsers();
+            for (final Map.Entry<String, Integer> entry : users.entrySet()) {
+                out.printf(" - %s = %s%n", entry.getKey(), entry.getValue());
             }
         };
     }
